@@ -95,8 +95,8 @@ void transmitSensors() {
     Serial.print("Freq:"); Serial.println(sensor.freq);
     Serial.print("RW:"); Serial.println(sensor.rightEncoder);
     Serial.print("LW:"); Serial.println(sensor.leftEncoder);
-    Serial.print("RR:"); Serial.println(sensor.rightReelEncoder);
-    Serial.print("LR:"); Serial.println(sensor.leftReelEncoder);
+    // Serial.print("RR:"); Serial.println(sensor.rightReelEncoder);
+    // Serial.print("LR:"); Serial.println(sensor.leftReelEncoder);
   }
   
   Serial.write('{');

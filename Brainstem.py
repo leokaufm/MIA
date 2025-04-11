@@ -15,8 +15,8 @@ from connection import SerialConnection
 from connection import Surrogator
 from telemetry import TelemetryLoader
 from motor.SerialMotor import SerialMotor
-from motor.SerialReel import SerialReel
-from control import control_functions
+# from motor.SerialReel import SerialReel
+# from control import control_functions
 import Configuration
 
 ### Functions ###
@@ -134,9 +134,9 @@ if (Configuration.broadcast_IP):
 
 # Camera Streaming
 system_platform = platform.system()
-if system_platform == "Darwin":
+if system_platform == "Darwin": # Mac
   import FFMPegStreamer as pcs
-else:
+else: # Windows, Linux
   import H264Streamer as pcs
 
 dosomestreaming = False
@@ -151,7 +151,7 @@ if dosomestreaming:
 # Motors and Reels connections
 connection = SerialConnection()
 motors = SerialMotor(connection=connection)
-reels = SerialReel(connection=connection)
+#reels = SerialReel(connection=connection)
 
 # Sensors - Telemetry
 sensors = TelemetryLoader(connection)
@@ -163,11 +163,11 @@ signal.signal(signal.SIGTERM, lambda signum, frame: terminate())
 # Control Loop
 print('ALPIBot ready to follow!')
 autonomous = False
-control_strategies = {
-  'follow_and_turn': control_functions.follow_turn,
-  'rotate_and_go': control_functions.rotate_go
-}
-control_strategy = control_strategies['follow_and_turn']
+# control_strategies = {
+#   'follow_and_turn': control_functions.follow_turn,
+#   'rotate_and_go': control_functions.rotate_go
+# }
+# control_strategy = control_strategies['follow_and_turn']
 
 stream_telemetry = True
 AUTONOMOUS_SLEEP = 0.05
@@ -181,15 +181,15 @@ while True:
     cmd = sur.command
     cmd_data, address = sur.data, sur.address
     print(f"cmd_data, address: {cmd_data}, {address}")
-    time.sleep(5)
+    # time.sleep(5)
 
     if autonomous and cmd == '':
       # Autonomous control
       time.sleep(AUTONOMOUS_SLEEP)
       sdata = sensors.poll(frequency = 1, length = 1, stream = stream_telemetry)
-      [l_s, r_s] = control_strategy(sdata)
+      """ [l_s, r_s] = control_strategy(sdata)
       motors.left(l_s)
-      motors.right(r_s)
+      motors.right(r_s) """
       # print([l_s, r_s])
 
     elif cmd == 'A':
@@ -211,47 +211,50 @@ while True:
         else:
           print('Auto mode: OFF')
       
-      # Control strategies for autonomous mode
-      elif cmd_data == '1':
-        motors.stop()
-        control_strategy = control_strategies['follow_and_turn']
-        print('Control strat: Follow and Turn')
-      elif cmd_data == '2':
-        motors.stop()
-        control_strategy = control_strategies['rotate_and_go']
-        print('Control strat: Rotate and Go')
-
-      elif cmd_data == 'R':  # Enable/disable autonomous reels
-        connection.send(bytes('S1D250', 'ascii')) # Set reel speed to 250
-        connection.send(bytes('R00000', 'ascii'))  # Enable auto reels
-        print('Auto Reels toggle')
+        # Control strategies for autonomous mode -> undo indent when uncommenting
+        """ elif cmd_data == '1':
+          motors.stop()
+          control_strategy = control_strategies['follow_and_turn']
+          print('Control strat: Follow and Turn')
+        elif cmd_data == '2':
+          motors.stop()
+          control_strategy = control_strategies['rotate_and_go']
+          print('Control strat: Rotate and Go')
+          
+        elif cmd_data == 'R':  # Enable/disable autonomous reels
+          connection.send(bytes('S1D250', 'ascii')) # Set reel speed to 250
+          connection.send(bytes('R00000', 'ascii'))  # Enable auto reels
+          print('Auto Reels toggle') """
 
       elif cmd_data == '0':
         reset_sensors()
       
       else: # Manual commands
-        if cmd_data == 'k':
+        """ if cmd_data == 'k':
           reels.left(200)
         elif cmd_data == 'l':
           reels.right(200)
         elif cmd_data == 'r':
-          reels.both(200)
-        elif cmd_data == 'w':
+          reels.both(200) """
+        if cmd_data == 'w':
           print("Moving forward!")
           motors.both(100)
         elif cmd_data == 's':
+          print("Moving backward!")
           motors.both(-100)
         elif cmd_data == 'd':
+          print("Turning right!")
           motors.left(100)
           motors.right(-100)
         elif cmd_data == 'a':
+          print("Turning left!")
           motors.left(-100)
           motors.right(100)
         elif cmd_data == 'z':
           motors.stop()
         elif cmd_data == ' ':
           motors.stop()
-          reels.stop()
+          #reels.stop()
         elif cmd_data == 'p':
           sdata = sensors.poll(frequency=1, length=1, stream=stream_telemetry)
           print(sdata)

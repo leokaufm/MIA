@@ -1,4 +1,4 @@
-import numpy as np
+""" import numpy as np
 
 REEL_RADIUS = 12.2  # mm
 
@@ -61,3 +61,4 @@ def rotate_go(sensor_data):
     return map(to_motor_power, (vf, vf))
   else:  # Stop
     return (0, 0)
+ """

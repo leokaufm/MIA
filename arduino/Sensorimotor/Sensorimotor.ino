@@ -9,12 +9,12 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(1);
 Adafruit_DCMotor *leftMotor = AFMS.getMotor(2);
-Adafruit_DCMotor *rightReel = AFMS.getMotor(4);
-Adafruit_DCMotor *leftReel = AFMS.getMotor(3);
+// Adafruit_DCMotor *rightReel = AFMS.getMotor(4);
+// Adafruit_DCMotor *leftReel = AFMS.getMotor(3);
 
 bool debug = false;
 bool debugSensor = false;
-bool autoretract = false;
+// bool autoretract = false;
 String codeversion="1.0";
 
 struct sensortype
@@ -22,8 +22,8 @@ struct sensortype
   long code;
   long rightEncoder;
   long leftEncoder;
-  long rightReelEncoder;
-  long leftReelEncoder;
+  // long rightReelEncoder;
+  // long leftReelEncoder;
   float voltage;
   float current;
   long freq;
@@ -33,7 +33,7 @@ struct sensortype
 struct botStateType {
   long leftSpeed;
   long rightSpeed;
-  long reelSpeed;
+  // long reelSpeed;
 } botState;
 
 int StateMachine(int state, int controlvalue)
@@ -65,26 +65,26 @@ int StateMachine(int state, int controlvalue)
       stopLeft();
       stopRight();
       break;
-    case 0x0A: // left reel
-      leftReel->setSpeed(controlvalue);
-      leftReel->run(FORWARD);
-      break;   
-    case 0x0B: // right reel
-      rightReel->setSpeed(controlvalue);
-      rightReel->run(FORWARD);
-      break;
-    case 0x0C: // both reels
-      moveReels(controlvalue);
-      break;
-    case 0x0D: // stop reels
-      stopReels();
-      autoretract = false;
-      break;
+    // case 0x0A: // left reel
+    //   leftReel->setSpeed(controlvalue);
+    //   leftReel->run(FORWARD);
+    //   break;   
+    // case 0x0B: // right reel
+    //   rightReel->setSpeed(controlvalue);
+    //   rightReel->run(FORWARD);
+    //   break;
+    // case 0x0C: // both reels
+    //   moveReels(controlvalue);
+    //   break;
+    // case 0x0D: // stop reels
+    //   stopReels();
+    //   autoretract = false;
+    //   break;
     case 0x0F: // stop all motors and reels
       stopRight();
       stopLeft();
-      stopReels();
-      autoretract = false;
+      // stopReels();
+      // autoretract = false;
     default:
       // Do Nothing
       state = 0;
@@ -111,16 +111,16 @@ void setup() {
   moveRight(1);
   stopRight();
 
-  moveReels(1);
-  stopReels();
+  // moveReels(1);
+  // stopReels();
 
   memset(&sensor, 0, sizeof(sensor));
   memset(&botState, 0, sizeof(botState));
 
-  botState.reelSpeed = 100;
+  // botState.reelSpeed = 100;
   
   setupMotorEncoders();
-  setupReelEncoders();
+  // setupReelEncoders();
 }
 
 int incomingByte = 0;
@@ -173,11 +173,11 @@ void loop() {
       case 'C': 
         debugSensor = (!debugSensor);
         break;
-      case 'R':
-        autoretract = (!autoretract);
-        if (!autoretract)
-          stopReels();
-        break;
+      // case 'R':
+      //   autoretract = (!autoretract);
+      //   if (!autoretract)
+      //     stopReels();
+      //   break;
       case 'A': // motor controls
         readcommand(action, controlvalue);
         state = action; // let StateMachine process the action
@@ -204,9 +204,9 @@ void loop() {
           case 0x1C:
             setCode(controlvalue);
             break;
-          case 0x1D: 
-            setReelsSpeed(controlvalue);
-            break;
+          // case 0x1D: 
+          //   setReelsSpeed(controlvalue);
+          //   break;
           case 0x21:
             sendPayloadSize();
             break;
@@ -216,26 +216,26 @@ void loop() {
           case 0x30:
             // Reset encoders
             resetEncoders();
-            resetReelEncoders();
+            // resetReelEncoders();
             break;
         }
     }
   }
 
   loopEncoders();
-  loopReelEncoders();
+  // loopReelEncoders();
 
   StateMachine(state, controlvalue);
 
-  if (autoretract) {
-    reelsMotors();
-  }
+  // if (autoretract) {
+  //   reelsMotors();
+  // }
     
 
   if (debug) {
       Serial.print("RW:"); Serial.println(sensor.rightEncoder);
       Serial.print("LW:"); Serial.println(sensor.leftEncoder);
-      Serial.print("RR:"); Serial.println(sensor.rightReelEncoder);
-      Serial.print("LR:"); Serial.println(sensor.leftReelEncoder);
+      // Serial.print("RR:"); Serial.println(sensor.rightReelEncoder);
+      // Serial.print("LR:"); Serial.println(sensor.leftReelEncoder);
   }
 }
