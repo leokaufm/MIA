@@ -5,24 +5,54 @@ import time
 from connection import MCast
 import os
 import argparse
+import ConfigMe
+import Configuration
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+print('Parameters:' + str(sys.argv))
+# Fetch the remote ip if I do not have one.  It should be multicasted by ShinkeyBot
 reporter = MCast.Receiver()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--multicast', '--m', action='store_true')
-args, _ = parser.parse_known_args()
+ConfigMe.createconfig("config.ini")
 
-if args.multicast:
-  print('Waiting for Multicast message...')
-  bot_ip = reporter.receive()
-  print('Received Multicast message')
-  print('Bot IP:' + bot_ip)
-  ip = bot_ip
+# Load the configuration file
+lastip = ConfigMe.readconfig("config.ini")
+
+print("Last ip used:"+lastip)
+
+if (len(sys.argv)<2):
+    print ("Waiting for Multicast Message")
+    shinkeybotip = reporter.receive()
+    print ('Bot IP:' + shinkeybotip)
+    ip = shinkeybotip
+elif sys.argv[1] == '-f':
+    print ("Forcing IP Address")
+    ip = lastip
 else:
-  ip = sys.argv[1]
+    ip = sys.argv[1]
+    print ("Using IP:"+ip)
 
-print("Using IP:"+ip)
+ConfigMe.setconfig("config.ini","ip",ip)
+server_address = (ip, Configuration.controlport)
+
+# sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# reporter = MCast.Receiver()
+
+# parser = argparse.ArgumentParser()
+# parser.add_argument('--multicast', '--m', action='store_true')
+# args, _ = parser.parse_known_args()
+
+# if args.multicast:
+  # print('Waiting for Multicast message...')
+  # bot_ip = reporter.receive()
+  # print('Received Multicast message')
+  # print('Bot IP:' + bot_ip)
+  # ip = bot_ip
+# else:
+  # ip = sys.argv[1]
+
+# print("Using IP:"+ip)
 
 server_address = (ip, 30001)
 
@@ -55,6 +85,7 @@ getch = _find_getch()
 print('Press X to stop Bot')
 print('Press x to exit this controller')
 print('Press f to enter new update frequency for the bot.')
+print('Press c to send commands to the bot.')
 
 while (True):
   print('>')
@@ -63,8 +94,19 @@ while (True):
   if (data.startswith('x')):
     sock.close()
     quit()
+  
+  if (data.startswith('f')):
+      newfreq = input('Freq:');
+      sent = sock.sendto(bytes('AE'+'{:3d}'.format(newfreq),'ascii'), server_address)
+      sent = sock.sendto(bytes('AB'+'{:3d}'.format(1),'ascii'), server_address)
+  elif (data.startswith('c')):
+      print('Command:')
+      cmd = sys.stdin.readline()
+      sent = sock.sendto(bytes(cmd,'ascii'), server_address)
+  else:
+      sent = sock.sendto(bytes('U'+data+'000','ascii'), server_address)
 
-  sent = sock.sendto(bytes('U'+data+'000', 'ascii'), server_address)
+  # sent = sock.sendto(bytes('U'+data+'000', 'ascii'), server_address)
 
   if (data.startswith('!')):
     print("Letting know Bot that I want streaming....")

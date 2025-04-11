@@ -11,16 +11,17 @@ baudrate = 9600
 TRIES = 3
 
 system_platform = platform.system()
-if system_platform == "Darwin":
+""" if system_platform == "Darwin":
   import FFMPegStreamer as pcs
   portname = '/dev/cu.usbmodem14101'
 else:
   import H264Streamer as pcs
-  portname = None
+  portname = None """
 
 
 class SerialConnection(object):
   def __init__(self):
+    print("Connecting...")
     self.connect()
 
   def connect(self):
@@ -60,6 +61,7 @@ class SerialConnection(object):
   def send(self, data):
     if self.ser is None:
       raise serial.SerialException('Serial connection not open')
+    print(f"Sending data {data} to RPi")
     return self.ser.write(data)
 
   def read(self, length):

@@ -14,20 +14,52 @@ from connection import MCast
 from connection import SerialConnection
 from connection import Surrogator
 from telemetry import TelemetryLoader
-from motor import SerialMotor
-from motor import SerialReel
+from motor.SerialMotor import SerialMotor
+from motor.SerialReel import SerialReel
 from control import control_functions
+import Configuration
 
-# --- Disabling this for now, it was giving me some headaches
-# First create a witness token to guarantee only one instance running
+### Functions ###
+def remove_wt_and_exit(signum, frame):
+  os.remove('running.wt')
+  exit(0)
+
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
+def timeout():
+    print ('Sending a multicast update of my own ip address:'+myip)
+    noticer.send()
+
+# Stop all motors when process is killed
+def terminate():
+  print('Stopping ALPIBot')
+  try:
+    # motors.stop()
+    # reels.stop()
+    os.remove('running.wt')
+  finally:
+    print('ALPIBot has stopped.')
+  exit(0)
+
+def reset_sensors():
+  connection.send(bytes('S30000', 'ascii'))
+
+### Program ###
+# Create a witness token to guarantee only one instance running
 if (os.access("running.wt", os.R_OK)):
     print('Another instance is running. Cancelling.')
     quit(1)
 runningtoken = open('running.wt', 'w')
-
-def remove_wt_and_exit(signum, frame):
-  os.remove('running.wt')
-  exit(0)
 
 signal.signal(signal.SIGINT, remove_wt_and_exit)
 signal.signal(signal.SIGTERM, remove_wt_and_exit)
@@ -38,17 +70,53 @@ st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
 runningtoken.write(st)
 runningtoken.close()
 
-parser = argparse.ArgumentParser()
+""" parser = argparse.ArgumentParser()
 parser.add_argument('--multicast', '-m', action='store_true')
-args = parser.parse_args()
+args = parser.parse_args() """
 
-### IP Broadcast ###
+# IP Broadcast
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 fcntl.fcntl(sock, fcntl.F_SETFL, os.O_NONBLOCK)
+# Remote controller server for BotController.py
+print('Starting up Controller Server on 0.0.0.0, port 30001')
+server_address = ('0.0.0.0', 30001)
+sock.bind(server_address)
+sur = Surrogator(sock)
+
+if (Configuration.broadcast_IP):
+    sock.setblocking(0)
+    sock.settimeout(0.01)
+
+noticer = MCast.Sender()
+
+myip = get_ip_address('wlan0')
+
+if (len(myip)>0):
+    myip = myip
+else:
+    myip = 'None'
 
 start = time.time()
-noticer = MCast.Sender()
-if args.multicast:
+print('Multicasting my own IP address: ' + myip)
+while Configuration.broadcast_IP:
+    noticer.send()
+    try:
+        data, address = sock.recvfrom(1)
+        print(f"data, address: {data}, {address}")
+        if (len(data) > 0):
+            break
+    except:
+        data = None
+
+    if (abs(time.time()- start) > 100):
+        print('Giving up broadcasting ip... Lets get started.')
+        break
+
+if (Configuration.broadcast_IP):
+    sock.setblocking(1)
+    sock.settimeout(0)
+
+""" if args.multicast:
   print('Multicasting my IP address...')
   while True:
     noticer.send()
@@ -62,9 +130,9 @@ if args.multicast:
       pass
     if (abs(time.time()- start) > 30):
       print('Giving up broadcasting IP... Lets get started.')
-      break
+      break """
 
-### Camera Streaming ###
+# Camera Streaming
 system_platform = platform.system()
 if system_platform == "Darwin":
   import FFMPegStreamer as pcs
@@ -80,39 +148,19 @@ if dosomestreaming:
   except Exception as e:
     print('Error starting H264 stream thread:'+e)
 
-
-### Remote controller server for BotController.py ###
-print('Starting up Controller Server on 0.0.0.0, port 30001')
-server_address = ('0.0.0.0', 30001)
-sock.bind(server_address)
-sur = Surrogator(sock)
-
-### Motors and Reels connections ###
+# Motors and Reels connections
 connection = SerialConnection()
 motors = SerialMotor(connection=connection)
 reels = SerialReel(connection=connection)
 
-### Sensors - Telemetry ###
+# Sensors - Telemetry
 sensors = TelemetryLoader(connection)
 
-### Stop all motors when process is killed ###
-def terminate():
-  print('Stopping ALPIBot')
-  try:
-    motors.stop()
-    reels.stop()
-    os.remove('running.wt')
-  finally:
-    print('ALPIBot has stopped.')
-  exit(0)
 
 signal.signal(signal.SIGINT, lambda signum, frame: terminate())
 signal.signal(signal.SIGTERM, lambda signum, frame: terminate())
 
-def reset_sensors():
-  connection.send(bytes('S30000', 'ascii'))
-
-### Control Loop ###
+# Control Loop
 print('ALPIBot ready to follow!')
 autonomous = False
 control_strategies = {
@@ -132,6 +180,8 @@ while True:
 
     cmd = sur.command
     cmd_data, address = sur.data, sur.address
+    print(f"cmd_data, address: {cmd_data}, {address}")
+    time.sleep(5)
 
     if autonomous and cmd == '':
       # Autonomous control
@@ -187,6 +237,7 @@ while True:
         elif cmd_data == 'r':
           reels.both(200)
         elif cmd_data == 'w':
+          print("Moving forward!")
           motors.both(100)
         elif cmd_data == 's':
           motors.both(-100)
@@ -221,8 +272,8 @@ while True:
 
 terminate()
 
-vst.keeprunning = False
-vst.interrupt()
+# vst.keeprunning = False
+# vst.interrupt()
 sur.keeprunning = False
 
 # When everything done, release the capture
