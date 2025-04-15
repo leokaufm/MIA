@@ -13,4 +13,4 @@ class SerialHead:
     self.connection.send(bytes('A0C'+'{:3d}'.format(speed), 'ascii')) """
 
   def stop(self):
-    self.connection.send(bytes('A0D000', 'ascii'))
+    self.connection.send(bytes('A0C'+'{:3d}'.format(0), 'ascii'))

@@ -182,7 +182,7 @@ while True:
     cmd = sur.command
     cmd_data, address = sur.data, sur.address
     print(f"cmd_data, address: {cmd_data}, {address}")
-    time.sleep(5)
+    # time.sleep(5)
 
     if autonomous and cmd == '':
       # Autonomous control
@@ -241,7 +241,7 @@ while True:
            head.left(100)
            print("Turning head to the left!")
         elif cmd_data == 'e':
-           head.left(100)
+           head.right(100)
            print("Turning head to the right!")
         elif cmd_data == 'r':
            head.stop()
