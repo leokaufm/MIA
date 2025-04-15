@@ -238,10 +238,10 @@ while True:
         elif cmd_data == 'r':
           reels.both(200) """
         if cmd_data == 'q':
-           head.left(100)
+           head.left(80)
            print("Turning head to the left!")
         elif cmd_data == 'e':
-           head.right(100)
+           head.right(80)
            print("Turning head to the right!")
         elif cmd_data == 'r':
            head.stop()
