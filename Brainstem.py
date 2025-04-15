@@ -15,7 +15,7 @@ from connection import SerialConnection
 from connection import Surrogator
 from telemetry import TelemetryLoader
 from motor.SerialMotor import SerialMotor
-# from motor.SerialReel import SerialReel
+from motor.SerialHead import SerialHead
 # from control import control_functions
 import Configuration
 
@@ -151,6 +151,7 @@ if dosomestreaming:
 # Motors and Reels connections
 connection = SerialConnection()
 motors = SerialMotor(connection=connection)
+head = SerialHead(connection=connection)
 #reels = SerialReel(connection=connection)
 
 # Sensors - Telemetry
@@ -181,7 +182,7 @@ while True:
     cmd = sur.command
     cmd_data, address = sur.data, sur.address
     print(f"cmd_data, address: {cmd_data}, {address}")
-    # time.sleep(5)
+    time.sleep(5)
 
     if autonomous and cmd == '':
       # Autonomous control
@@ -236,7 +237,16 @@ while True:
           reels.right(200)
         elif cmd_data == 'r':
           reels.both(200) """
-        if cmd_data == 'w':
+        if cmd_data == 'q':
+           head.left(100)
+           print("Turning head to the left!")
+        elif cmd_data == 'e':
+           head.left(100)
+           print("Turning head to the right!")
+        elif cmd_data == 'r':
+           head.stop()
+           print("Stopping head!")
+        elif cmd_data == 'w':
           print("Moving forward!")
           motors.both(100)
         elif cmd_data == 's':

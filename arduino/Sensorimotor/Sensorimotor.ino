@@ -9,8 +9,8 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(1);
 Adafruit_DCMotor *leftMotor = AFMS.getMotor(2);
+Adafruit_DCMotor *head = AFMS.getMotor(3);
 // Adafruit_DCMotor *rightReel = AFMS.getMotor(4);
-// Adafruit_DCMotor *leftReel = AFMS.getMotor(3);
 
 bool debug = false;
 bool debugSensor = false;
@@ -23,7 +23,7 @@ struct sensortype
   long rightEncoder;
   long leftEncoder;
   // long rightReelEncoder;
-  // long leftReelEncoder;
+  long headEncoder;
   float voltage;
   float current;
   long freq;
@@ -33,7 +33,7 @@ struct sensortype
 struct botStateType {
   long leftSpeed;
   long rightSpeed;
-  // long reelSpeed;
+  long headSpeed;
 } botState;
 
 int StateMachine(int state, int controlvalue)
@@ -65,17 +65,15 @@ int StateMachine(int state, int controlvalue)
       stopLeft();
       stopRight();
       break;
-    // case 0x0A: // left reel
-    //   leftReel->setSpeed(controlvalue);
-    //   leftReel->run(FORWARD);
-    //   break;   
-    // case 0x0B: // right reel
-    //   rightReel->setSpeed(controlvalue);
-    //   rightReel->run(FORWARD);
-    //   break;
-    // case 0x0C: // both reels
-    //   moveReels(controlvalue);
-    //   break;
+    case 0x0A: // head to the left
+      moveHead(controlvalue);
+      break;   
+    case 0x0B: // head to the right
+      moveHead(-controlvalue);
+      break;
+    case 0x0C: // stop head
+      stopHead();
+      break;
     // case 0x0D: // stop reels
     //   stopReels();
     //   autoretract = false;
@@ -83,6 +81,7 @@ int StateMachine(int state, int controlvalue)
     case 0x0F: // stop all motors and reels
       stopRight();
       stopLeft();
+      stopHead();
       // stopReels();
       // autoretract = false;
     default:
@@ -111,8 +110,8 @@ void setup() {
   moveRight(1);
   stopRight();
 
-  // moveReels(1);
-  // stopReels();
+  moveHead(1);
+  stopHead();
 
   memset(&sensor, 0, sizeof(sensor));
   memset(&botState, 0, sizeof(botState));

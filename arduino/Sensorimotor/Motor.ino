@@ -1,5 +1,5 @@
-#define REEL_WAIT_TIME 300
-#define REEL_RETRACT_TIME 500
+// #define REEL_WAIT_TIME 300
+// #define REEL_RETRACT_TIME 500
 
 // bool retracting = false;
 
@@ -67,6 +67,24 @@ void stopLeft() {
 
 void stopRight() {
   move(rightMotor, 0);
+}
+
+void moveHead(int speed) {
+  botState.headSpeed = speed;
+  if (speed == 0){
+    head->run(RELEASE);
+  } else {
+    head->setSpeed(abs(speed));
+    if (speed > 0) {
+      head->run(FORWARD);
+    } else {
+      head->run(BACKWARD);
+    }
+  }
+}
+
+void stopHead() {
+  moveHead(0);
 }
 
 void move(Adafruit_DCMotor * motor, int speed) {
