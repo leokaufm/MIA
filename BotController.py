@@ -82,18 +82,14 @@ def _find_getch():
 
 getch = _find_getch()
 
-print('Press X to stop Bot')
-print('Press x to exit this controller')
+print('Press x to stop Bot')
 print('Press f to enter new update frequency for the bot.')
 print('Press c to send commands to the bot.')
+print('Press i to start interaction sequence.')
 
 while (True):
   print('>')
   data = getch()
-
-  if (data.startswith('x')):
-    sock.close()
-    quit()
   
   if (data.startswith('f')):
       newfreq = input('Freq:');
@@ -105,13 +101,15 @@ while (True):
       sent = sock.sendto(bytes(cmd,'ascii'), server_address)
   else:
       sent = sock.sendto(bytes('U'+data+'000','ascii'), server_address)
+  """elif (data.startswith('i')):
+      sent = sock.sendto(bytes(cmd,'ascii'), server_address)"""
 
   # sent = sock.sendto(bytes('U'+data+'000', 'ascii'), server_address)
 
   if (data.startswith('!')):
     print("Letting know Bot that I want streaming....")
 
-  if (data.startswith('X')):
+  if (data.startswith('x')):
     break
 
 print("Stopping ALPIBot....")

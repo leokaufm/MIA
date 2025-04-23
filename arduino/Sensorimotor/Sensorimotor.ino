@@ -65,10 +65,10 @@ int StateMachine(int state, int controlvalue)
       stopLeft();
       stopRight();
       break;
-    case 0x0A: // head to the left
+    case 0x0A: // tilt head to the left
       moveHead(controlvalue);
       break;   
-    case 0x0B: // head to the right
+    case 0x0B: // tilt head to the right
       moveHead(-controlvalue);
       break;
     case 0x0C: // stop head

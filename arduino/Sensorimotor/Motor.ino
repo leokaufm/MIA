@@ -53,6 +53,24 @@
 //   }
 // }
 
+void move(Adafruit_DCMotor * motor, int speed) {
+  if (motor == rightMotor)
+    botState.rightSpeed = speed;
+  else
+    botState.leftSpeed = speed;
+
+  if (speed == 0) {
+    motor->run(RELEASE);
+  } else {
+    motor->setSpeed(abs(speed));
+    if (speed > 0) {
+      motor->run(FORWARD);
+    } else {
+      motor->run(BACKWARD);
+    }
+  }    
+}
+
 void moveLeft(int speed) {
   move(leftMotor, speed);
 }
@@ -76,9 +94,9 @@ void moveHead(int speed) {
   } else {
     head->setSpeed(abs(speed));
     if (speed > 0) {
-      head->run(FORWARD);
-    } else {
       head->run(BACKWARD);
+    } else {
+      head->run(FORWARD);
     }
   }
 }
@@ -87,22 +105,47 @@ void stopHead() {
   moveHead(0);
 }
 
-void move(Adafruit_DCMotor * motor, int speed) {
-  if (motor == rightMotor)
-    botState.rightSpeed = speed;
-  else
-    botState.leftSpeed = speed;
+void panel1(){
+  // panel 1 - Curiosity
+  delay(5000);
 
-  if (speed == 0) {
-    motor->run(RELEASE);
-  } else {
-    motor->setSpeed(abs(speed));
-    if (speed > 0) {
-      motor->run(FORWARD);
-    } else {
-      motor->run(BACKWARD);
-    }
-  }    
+  moveBoth(100); // approach
+  delay(1000);
+  stopBoth();
+  delay(100);
+
+  moveHead(40); // tilt head to left
+  delay(80);
+
+  stopHead(); // stop head, questioning look 
+  delay(2000);
+
+  moveHead(-40); // move head back
+  delay(115);
+  stopHead();
+  delay(500);
+}
+
+void panel2(){
+  // Panel 2 - Excitement
+  moveBoth(-100); // retreat a little
+  delay(1500);
+  stopBoth();
+  delay(5000);
+
+  /*turnRight(200); // infinity sign to express joy
+  delay(1500);
+  stopBoth(); */
+
+  /* turnLeft(150);
+  delay(450);
+  turnRight(150);
+  delay(250);
+  stopBoth(); */
+}
+
+void interaction_sequence(){
+  panel1();
 }
 
 // void stopReels() {
