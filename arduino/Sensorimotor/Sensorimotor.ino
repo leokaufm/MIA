@@ -4,6 +4,11 @@
 
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
+#include "MeMCore.h"
+#include <SoftwareSerial.h>
+
+//#define sigPin 3
+MeUltrasonicSensor ultraSensor(PORT_3);
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
@@ -14,7 +19,6 @@ Adafruit_DCMotor *head = AFMS.getMotor(3);
 
 bool debug = false;
 bool debugSensor = false;
-// bool autoretract = false;
 String codeversion="1.0";
 
 struct sensortype
@@ -22,7 +26,6 @@ struct sensortype
   long code;
   long rightEncoder;
   long leftEncoder;
-  // long rightReelEncoder;
   long headEncoder;
   float voltage;
   float current;
@@ -66,24 +69,19 @@ int StateMachine(int state, int controlvalue)
       stopRight();
       break;
     case 0x0A: // tilt head to the left
-      moveHead(controlvalue);
+      moveHead(-controlvalue);
       break;   
     case 0x0B: // tilt head to the right
-      moveHead(-controlvalue);
+      moveHead(controlvalue);
       break;
     case 0x0C: // stop head
       stopHead();
       break;
-    // case 0x0D: // stop reels
-    //   stopReels();
-    //   autoretract = false;
-    //   break;
     case 0x0F: // stop all motors and reels
       stopRight();
       stopLeft();
       stopHead();
-      // stopReels();
-      // autoretract = false;
+      break;
     default:
       // Do Nothing
       state = 0;
@@ -149,6 +147,14 @@ void readcommand(int &action, int &controlvalue)
 
 // the loop routine runs over and over again forever:
 void loop() {
+  // Ultrasonic sensor for distance:
+  long distance = ultraSensor.distanceCm();
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println("cm");
+  delay(100);
+
+  // Control/command loop:
   unsigned long currentMillis = millis();
   int incomingByte;
   int action, state, controlvalue;

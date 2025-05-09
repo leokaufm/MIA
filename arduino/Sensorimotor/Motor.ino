@@ -64,9 +64,9 @@ void move(Adafruit_DCMotor * motor, int speed) {
   } else {
     motor->setSpeed(abs(speed));
     if (speed > 0) {
-      motor->run(FORWARD);
-    } else {
       motor->run(BACKWARD);
+    } else {
+      motor->run(FORWARD);
     }
   }    
 }
@@ -79,12 +79,32 @@ void moveRight(int speed) {
   move(rightMotor, speed);
 }
 
+void moveBoth(int speed) {
+  moveLeft(speed);
+  moveRight(speed);
+}
+
+void turnRight(int speed) {
+  moveLeft(-speed);
+  moveRight(speed);
+}
+
+void turnLeft(int speed) {
+  moveLeft(speed);
+  moveRight(-speed);
+}
+
 void stopLeft() {
   move(leftMotor, 0);
 }
 
 void stopRight() {
   move(rightMotor, 0);
+}
+
+void stopBoth() {
+  stopLeft();
+  stopRight();
 }
 
 void moveHead(int speed) {
@@ -105,48 +125,47 @@ void stopHead() {
   moveHead(0);
 }
 
-void panel1(){
-  // panel 1 - Curiosity
-  delay(5000);
-
-  moveBoth(100); // approach
-  delay(1000);
-  stopBoth();
-  delay(100);
-
-  moveHead(40); // tilt head to left
-  delay(80);
-
-  stopHead(); // stop head, questioning look 
-  delay(2000);
-
-  moveHead(-40); // move head back
-  delay(115);
-  stopHead();
-  delay(500);
-}
+/* void panel1(){
+  panel 1 - waking up/greeting
+  
+} 
 
 void panel2(){
-  // Panel 2 - Excitement
+  // panel 2 - Curiosity
+    moveBoth(100); // approach
+    delay(1000);
+    stopBoth();
+    delay(100);
+
+    moveHead(40); // tilt head to left
+    delay(80);
+    stopHead(); // stop head, questioning look 
+    delay(2000);
+    moveHead(-40); // move head back
+    delay(115);
+    stopHead();
+    delay(500);
+}
+
+void panel3(){
+  // Panel 3 - Excitement
   moveBoth(-100); // retreat a little
   delay(1500);
   stopBoth();
-  delay(5000);
+  delay(2000);
 
-  /*turnRight(200); // infinity sign to express joy
-  delay(1500);
-  stopBoth(); */
+  turnRight(200); // 360 turn to the right
+  delay(2000);
+  stopBoth();
 
-  /* turnLeft(150);
-  delay(450);
-  turnRight(150);
-  delay(250);
-  stopBoth(); */
+  turnLeft(200); // 360 turn to the left
+  delay(1800);
+  stopBoth();
 }
 
 void interaction_sequence(){
   panel1();
-}
+} */
 
 // void stopReels() {
 //   moveReels(0);
