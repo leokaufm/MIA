@@ -1,17 +1,14 @@
 import platform
 import time
 import serial
-import datetime
 import os
-
-import datetime
 
 baudrate = 9600
 
 TRIES = 3
 
 system_platform = platform.system()
-""" if system_platform == "Darwin":
+"""if system_platform == "Darwin":
   import FFMPegStreamer as pcs
   portname = '/dev/cu.usbmodem14101'
 else:
@@ -49,7 +46,7 @@ class SerialConnection(object):
     # Raspberry
     else:
       print('Raspi environment. Trying ports /dev/ttyACM...')
-      for p in range(0, 16):
+      for p in range(0, 5):
         port = '/dev/ttyACM' + str(p)
         if (os.path.exists(port)):
           ser = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
@@ -61,7 +58,7 @@ class SerialConnection(object):
   def send(self, data):
     if self.ser is None:
       raise serial.SerialException('Serial connection not open')
-    print(f"Sending data {data} to RPi")
+    # print(f"Sending data {data.decode('utf-8')} to RPi")
     return self.ser.write(data)
 
   def read(self, length):

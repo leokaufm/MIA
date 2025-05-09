@@ -16,8 +16,10 @@ from connection import Surrogator
 from telemetry import TelemetryLoader
 from motor.SerialMotor import SerialMotor
 from motor.SerialHead import SerialHead
-# from control import control_functions
+from connection.H264Client import H264Client
 import Configuration
+
+HOST = "10.2.69.53" # find out ip address on laptop (server) with "hostname -I"
 
 ### Functions ###
 def remove_wt_and_exit(signum, frame):
@@ -116,64 +118,48 @@ if (Configuration.broadcast_IP):
     sock.setblocking(1)
     sock.settimeout(0)
 
-""" if args.multicast:
-  print('Multicasting my IP address...')
-  while True:
-    noticer.send()
-    time.sleep(1)
-    try:
-      data, address = sock.recvfrom(1)
-      print(len(data))
-      if len(data) > 0:
-        break
-    except:
-      pass
-    if (abs(time.time()- start) > 30):
-      print('Giving up broadcasting IP... Lets get started.')
-      break """
-
-# Camera Streaming
+""" # Camera Streaming
 system_platform = platform.system()
 if system_platform == "Darwin": # Mac
   import FFMPegStreamer as pcs
 else: # Windows, Linux
-  import H264Streamer as pcs
+  import H264Streamer as pcs 
 
-dosomestreaming = False
+dosomestreaming = True
 
 vst = pcs.H264VideoStreamer()
-if dosomestreaming:
+if (dosomestreaming):
   try:
-    vst.startAndConnect()
+    #vst.startAndConnect()
+    vst.spanAndConnect()
+    pass
   except Exception as e:
-    print('Error starting H264 stream thread:'+e)
+      print('Error starting H264 stream thread:'+str(e))"""
 
 # Motors and Reels connections
 connection = SerialConnection()
 motors = SerialMotor(connection=connection)
 head = SerialHead(connection=connection)
-#reels = SerialReel(connection=connection)
 
 # Sensors - Telemetry
-sensors = TelemetryLoader(connection)
+# sensors = TelemetryLoader(connection)
 
 
 signal.signal(signal.SIGINT, lambda signum, frame: terminate())
 signal.signal(signal.SIGTERM, lambda signum, frame: terminate())
 
 # Control Loop
-print('ALPIBot ready to follow!')
-autonomous = False
+print('Bot ready to follow!')
 # control_strategies = {
 #   'follow_and_turn': control_functions.follow_turn,
 #   'rotate_and_go': control_functions.rotate_go
 # }
 # control_strategy = control_strategies['follow_and_turn']
 
-stream_telemetry = True
-AUTONOMOUS_SLEEP = 0.05
+# stream_telemetry = True
+# AUTONOMOUS_SLEEP = 0.05
 # Live
-while True:
+while True:     
   try:
     data = ''
     # TCP/IP server is configured as non-blocking
@@ -181,99 +167,98 @@ while True:
 
     cmd = sur.command
     cmd_data, address = sur.data, sur.address
-    print(f"cmd_data, address: {cmd_data}, {address}")
-    # time.sleep(5)
+    if cmd:
+      print(f"cmd: {cmd}, cmd_data: {cmd_data}, address: {address}")
 
-    if autonomous and cmd == '':
+    """ if autonomous and cmd == '':
       # Autonomous control
       time.sleep(AUTONOMOUS_SLEEP)
       sdata = sensors.poll(frequency = 1, length = 1, stream = stream_telemetry)
-      """ [l_s, r_s] = control_strategy(sdata)
+      [l_s, r_s] = control_strategy(sdata)
       motors.left(l_s)
-      motors.right(r_s) """
-      # print([l_s, r_s])
+      motors.right(r_s)
+      # print([l_s, r_s]) """
 
-    elif cmd == 'A':
+    if cmd == 'A':
       if (len(sur.message) == 5):
         # Sending the message that was received.
         print(sur.message)
         connection.send(sur.message)
         sur.message = ''
+    
+    elif cmd == "S":
+      # Implement video streaming and recording
+      if cmd_data == '!':
+        # Set video streaming and recording
+        video_client = H264Client(server_ip=HOST)
+        print("Start video")
+        video_client.spanAndConnect()
+      """ elif cmd_data == '?':
+        print("Stop video")
+        video_client.stopVideo()  """        
 
     elif cmd == 'U':
-      if cmd_data == 'X':
+      if cmd_data == 'x':
+        motors.stop()
+        head.stop()
         break
+      elif cmd_data == 'h':
+        motors.stop()
+        head.stop()
+        print("Bot on hold!")
 
-      if cmd_data == 'M': # Enable/disable autonomous command
+      """ if cmd_data == 'M': # Enable/disable autonomous command
         autonomous = not autonomous
         reset_sensors()
         if autonomous:
           print('Auto mode: ON')
         else:
-          print('Auto mode: OFF')
+          print('Auto mode: OFF') """
       
-        # Control strategies for autonomous mode -> undo indent when uncommenting
-        """ elif cmd_data == '1':
-          motors.stop()
-          control_strategy = control_strategies['follow_and_turn']
-          print('Control strat: Follow and Turn')
-        elif cmd_data == '2':
-          motors.stop()
-          control_strategy = control_strategies['rotate_and_go']
-          print('Control strat: Rotate and Go')
-          
-        elif cmd_data == 'R':  # Enable/disable autonomous reels
-          connection.send(bytes('S1D250', 'ascii')) # Set reel speed to 250
-          connection.send(bytes('R00000', 'ascii'))  # Enable auto reels
-          print('Auto Reels toggle') """
+      # Control strategies for autonomous mode
+      """ elif cmd_data == '1':
+        motors.stop()
+        control_strategy = control_strategies['follow_and_turn']
+        print('Control strat: Follow and Turn')
+      elif cmd_data == '2':
+        motors.stop()
+        control_strategy = control_strategies['rotate_and_go']
+        print('Control strat: Rotate and Go') """
 
-      elif cmd_data == '0':
+      if cmd_data == '0':
         reset_sensors()
       
       else: # Manual commands
-        """ if cmd_data == 'k':
-          reels.left(200)
-        elif cmd_data == 'l':
-          reels.right(200)
-        elif cmd_data == 'r':
-          reels.both(200) """
-        if cmd_data == 'q':
-           head.left(80)
-           print("Turning head to the left!")
-        elif cmd_data == 'e':
-           head.right(80)
-           print("Turning head to the right!")
-        elif cmd_data == 'r':
-           head.stop()
-           print("Stopping head!")
-        elif cmd_data == 'w':
-          print("Moving forward!")
-          motors.both(100)
-        elif cmd_data == 's':
-          print("Moving backward!")
-          motors.both(-100)
-        elif cmd_data == 'd':
-          print("Turning right!")
-          motors.left(100)
-          motors.right(-100)
-        elif cmd_data == 'a':
-          print("Turning left!")
-          motors.left(-100)
-          motors.right(100)
+        if cmd_data == '':
+          motors.stop()
+          head.stop()
+        elif cmd_data == 'w': # backward
+          motors.both(80)
+        elif cmd_data == 's': # forward
+          motors.both(-80)
+        elif cmd_data == 'd': # turn right
+          motors.left(-80)
+          motors.right(80)
+        elif cmd_data == 'a': # turn left
+          motors.left(80)
+          motors.right(-80)
         elif cmd_data == 'z':
           motors.stop()
+        elif cmd_data == 'q':
+          head.left(40)
+        elif cmd_data == 'e':
+          head.right(40)
+        elif cmd_data == 'r':
+          head.stop()
         elif cmd_data == ' ':
           motors.stop()
-          #reels.stop()
-        elif cmd_data == 'p':
-          sdata = sensors.poll(frequency=1, length=1, stream=stream_telemetry)
-          print(sdata)
-        elif cmd_data == 't':
+          head.stop()
+        """ elif cmd_data == 't':
           stream_telemetry = not stream_telemetry
           if stream_telemetry:
             print('Telemetry broadcast: ON')
           else:
-            print('Telemetry broadcast: OFF')
+            print('Telemetry broadcast: OFF') """
   except (OSError, serial.SerialException):
     print('Serial connection error. Trying to reconnect...')
     connection.reconnect()
@@ -285,8 +270,8 @@ while True:
 
 terminate()
 
-# vst.keeprunning = False
-# vst.interrupt()
+vst.keeprunning = False
+vst.interrupt()
 sur.keeprunning = False
 
 # When everything done, release the capture

@@ -2,15 +2,15 @@
 import socket
 import sys
 import time
+
 from connection import MCast
-import os
-import argparse
 import ConfigMe
 import Configuration
+from connection.H264Server import H264Server
 
+# Socket for transmitting commands to the bot
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-print('Parameters:' + str(sys.argv))
 # Fetch the remote ip if I do not have one.  It should be multicasted by ShinkeyBot
 reporter = MCast.Receiver()
 
@@ -23,9 +23,9 @@ print("Last ip used:"+lastip)
 
 if (len(sys.argv)<2):
     print ("Waiting for Multicast Message")
-    shinkeybotip = reporter.receive()
-    print ('Bot IP:' + shinkeybotip)
-    ip = shinkeybotip
+    botip = reporter.receive()
+    print ('Bot IP:' + botip)
+    ip = botip
 elif sys.argv[1] == '-f':
     print ("Forcing IP Address")
     ip = lastip
@@ -35,26 +35,6 @@ else:
 
 ConfigMe.setconfig("config.ini","ip",ip)
 server_address = (ip, Configuration.controlport)
-
-# sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# reporter = MCast.Receiver()
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--multicast', '--m', action='store_true')
-# args, _ = parser.parse_known_args()
-
-# if args.multicast:
-  # print('Waiting for Multicast message...')
-  # bot_ip = reporter.receive()
-  # print('Received Multicast message')
-  # print('Bot IP:' + bot_ip)
-  # ip = bot_ip
-# else:
-  # ip = sys.argv[1]
-
-# print("Using IP:"+ip)
-
-server_address = (ip, 30001)
 
 def _find_getch():
   try:
@@ -84,33 +64,45 @@ getch = _find_getch()
 
 print('Press x to stop Bot')
 print('Press f to enter new update frequency for the bot.')
-print('Press c to send commands to the bot.')
 print('Press i to start interaction sequence.')
+print('Press ! to start video recording and streaming.')
 
 while (True):
+  time.sleep(0.1) # control here how long the bot does a movement
   print('>')
-  data = getch()
+  data = None
+  # Send h for hold to stop all motors
+  while not data:
+    sent = sock.sendto(bytes('U'+'h'+'000','ascii'), server_address)
+    data = getch()
   
-  if (data.startswith('f')):
-      newfreq = input('Freq:');
-      sent = sock.sendto(bytes('AE'+'{:3d}'.format(newfreq),'ascii'), server_address)
-      sent = sock.sendto(bytes('AB'+'{:3d}'.format(1),'ascii'), server_address)
-  elif (data.startswith('c')):
-      print('Command:')
-      cmd = sys.stdin.readline()
-      sent = sock.sendto(bytes(cmd,'ascii'), server_address)
+  if (data.startswith('f')): # ???
+    newfreq = input('Freq:');
+    sent = sock.sendto(bytes('AE'+'{:3d}'.format(newfreq),'ascii'), server_address)
+    sent = sock.sendto(bytes('AB'+'{:3d}'.format(1),'ascii'), server_address)
+    """ elif (data.startswith('c')):
+        print('Command:')
+        cmd = sys.stdin.readline()
+        sent = sock.sendto(bytes(cmd,'ascii'), server_address) """
+  elif (data.startswith('!')):
+    print("Start video recording and streaming")
+    # Configurations for video recording and streaming
+    video_server = H264Server()
+    # video_server.connect()
+    video_server.spanAndConnect()
+    sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)
+    """ elif (data.startswith('?')):
+      print("Stop video recording and streaming") 
+      sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)"""
+  elif (data.startswith('x')):
+    break
   else:
-      sent = sock.sendto(bytes('U'+data+'000','ascii'), server_address)
+    sent = sock.sendto(bytes('U'+data+'000','ascii'), server_address)
+  
   """elif (data.startswith('i')):
       sent = sock.sendto(bytes(cmd,'ascii'), server_address)"""
 
-  # sent = sock.sendto(bytes('U'+data+'000', 'ascii'), server_address)
-
-  if (data.startswith('!')):
-    print("Letting know Bot that I want streaming....")
-
-  if (data.startswith('x')):
-    break
+  
 
 print("Stopping ALPIBot....")
 for i in range(1, 100):
