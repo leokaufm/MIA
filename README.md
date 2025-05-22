@@ -1,5 +1,5 @@
 # ALPI-bot
-Code for a patient-follower oxygen-tube-holder robot
+Code for a robot pet interacting with children.
 
 # Media
-* https://www.youtube.com/watch?v=FxIlZGT8ktU
+Based on: * https://www.youtube.com/watch?v=FxIlZGT8ktU
