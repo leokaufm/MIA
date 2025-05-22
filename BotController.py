@@ -6,7 +6,7 @@ import time
 from connection import MCast
 import ConfigMe
 import Configuration
-from connection.H264Server import H264Server
+from connection.H264Player import H264Player
 
 # Socket for transmitting commands to the bot
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -62,6 +62,8 @@ def _find_getch():
 
 getch = _find_getch()
 
+video_streaming  = False
+
 print('Press x to stop Bot')
 print('Press f to enter new update frequency for the bot.')
 print('Press i to start interaction sequence.')
@@ -85,15 +87,19 @@ while (True):
         cmd = sys.stdin.readline()
         sent = sock.sendto(bytes(cmd,'ascii'), server_address) """
   elif (data.startswith('!')):
-    print("Start video recording and streaming")
-    # Configurations for video recording and streaming
-    video_server = H264Server()
-    # video_server.connect()
-    video_server.spanAndConnect()
-    sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)
-    """ elif (data.startswith('?')):
-      print("Stop video recording and streaming") 
-      sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)"""
+    if not video_streaming:
+      print("Start video player, recording and streaming")
+      # Configurations for video recording and streaming
+      video_player = H264Player()
+      # video_server.connect()
+      video_player.spanAndConnect()
+      sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)
+      video_streaming = True
+    else:
+      print("Stop video player, recording and streaming")
+      sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)
+      video_player.interrupt()
+      video_streaming = False
   elif (data.startswith('x')):
     break
   else:

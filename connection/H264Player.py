@@ -3,10 +3,11 @@ import subprocess
 import datetime
 import os
 import threading
+import signal
 
 PORT = 10001
 
-class H264Server:
+class H264Player:
     def __init__(self):
         self.server_socket = None
         self.conn = None
@@ -17,7 +18,7 @@ class H264Server:
     def spanAndConnect(self):
         try:
             FNULL = open(os.devnull, 'w')
-            self.pro = subprocess.Popen(['/usr/bin/python3', 'connection/H264Server.py'],preexec_fn=os.setsid)
+            self.pro = subprocess.Popen(['/usr/bin/python3', 'connection/H264Player.py'],preexec_fn=os.setsid)
             if self.pro.stderr or self.pro.returncode:
                 return False
         except Exception as e:
@@ -31,12 +32,6 @@ class H264Server:
         except Exception as e:
             print ("Error:" + str(e))
             print ("Error: unable to start a new thread") 
-
-    """ def connect(self):
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind(("0.0.0.0", PORT))
-        self.server_socket.listen(1)
-        print(f"Listening on TCP port {PORT}...") """
 
     def streamAndRecordVideo(self, name):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,8 +66,23 @@ class H264Server:
                 self.server_socket.close()
                 print("Video saved to", output_file)
 
+    def interrupt(self):
+        print ('Interrupting stream h264 streamer...')
+
+        if (self.pro):
+            os.killpg(os.getpgid(self.pro.pid), signal.SIGTERM)  
+            print('Killing process')
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server_address = ("0.0.0.0", PORT)
+            sock.connect(server_address)
+            sock.send(b'1')
+            sock.close()
+        except Exception as e:
+            print('Streaming Server seems to be down:' + str(e))
+
 if __name__ == "__main__":
-    vd = H264Server()
+    vd = H264Player()
     vd.startAndConnect()
 
     input()

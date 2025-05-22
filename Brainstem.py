@@ -16,7 +16,7 @@ from connection import Surrogator
 from telemetry import TelemetryLoader
 from motor.SerialMotor import SerialMotor
 from motor.SerialHead import SerialHead
-from connection.H264Client import H264Client
+from connection.H264Streamer import H264Streamer
 import Configuration
 
 HOST = "10.2.69.53" # find out ip address on laptop (server) with "hostname -I"
@@ -136,6 +136,9 @@ if (dosomestreaming):
   except Exception as e:
       print('Error starting H264 stream thread:'+str(e))"""
 
+# Video Streaming
+video_streaming = False
+
 # Motors and Reels connections
 connection = SerialConnection()
 motors = SerialMotor(connection=connection)
@@ -188,14 +191,16 @@ while True:
     
     elif cmd == "S":
       # Implement video streaming and recording
-      if cmd_data == '!':
+      if not video_streaming:
         # Set video streaming and recording
-        video_client = H264Client(server_ip=HOST)
+        video_streamer = H264Streamer(server_ip=HOST)
         print("Start video")
-        video_client.spanAndConnect()
-      """ elif cmd_data == '?':
+        video_streamer.spanAndConnect()
+        video_streaming = True
+      else:
         print("Stop video")
-        video_client.stopVideo()  """        
+        video_streamer.interrupt()
+        video_streaming = False      
 
     elif cmd == 'U':
       if cmd_data == 'x':

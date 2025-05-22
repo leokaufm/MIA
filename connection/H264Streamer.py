@@ -3,6 +3,7 @@ import time
 import os
 import subprocess
 import threading
+import signal
 from picamera2 import Picamera2
 from libcamera import Transform
 from picamera2.encoders import H264Encoder
@@ -10,20 +11,23 @@ from picamera2.outputs import FileOutput
 
 HOST = "10.2.69.53" # find out ip address on laptop (server) with "hostname -I"
 
-class H264Client:
+class H264Streamer:
     def __init__(self, server_ip):
         self.picam2 = None
         self.encoder = None
         self.server_ip = server_ip
-        self.server_port = 10001
+        self.player_port = 10001
         self.stream = None
         self.output = None
         self.client_socket = None
+        self.thread = None
+
+        self.running = True
 
     def spanAndConnect(self):
         try:
             FNULL = open(os.devnull, 'w')
-            self.pro = subprocess.Popen(['/usr/bin/python3', 'connection/H264Client.py'],preexec_fn=os.setsid)
+            self.pro = subprocess.Popen(['/usr/bin/python3', 'connection/H264Streamer.py'],preexec_fn=os.setsid)
             if self.pro.stderr or self.pro.returncode:
                 return False
         except Exception as e:
@@ -39,9 +43,9 @@ class H264Client:
             print ("Error: unable to start a new thread")
 
     def startVideo(self, name):
-       print("Sleep 2")
-       time.sleep(2)
-       print("Woke up")
+       """ print("Sleep 5")
+       time.sleep(5)
+       print("Woke up") """
        # Picam2 setup
        self.picam2 = Picamera2()
        self.encoder = H264Encoder(1000000)
@@ -50,28 +54,33 @@ class H264Client:
 
        # TCP socket setup
        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-       self.client_socket.connect((self.server_ip, self.server_port))
+       self.client_socket.connect((self.server_ip, self.player_port))
 
        # Prepare file format
        self.stream = self.client_socket.makefile("wb")
        self.output = FileOutput(self.stream)
 
        # Start recording
-       """ self.picam2.start_recording(self.encoder, self.output)
+       self.picam2.start_recording(self.encoder, self.output)
        print("Recording started")
-       time.sleep(10) """
-       self.picam2.stop_recording()
-       self.stream.close()
-       self.client_socket.close()
+    
+    def interrupt(self):
+        print ('Interrupting stream h264 streamer...')
 
-    def stopVideo(self):
-       self.picam2.stop_recording()
-       self.stream.close()
-       self.client_socket.close()
-       print("Recording stopped")
+        if (self.pro):
+            os.killpg(os.getpgid(self.pro.pid), signal.SIGTERM)  
+            print('Killing process')
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            server_address = (self.server_ip, self.player_port)
+            sock.connect(server_address)
+            sock.send(b'1')
+            sock.close()
+        except Exception as e:
+            print('Streaming Server seems to be down:' + str(e))
 
 if __name__ == "__main__":
-    vd = H264Client(server_ip = HOST)
+    vd = H264Streamer(server_ip = HOST)
     vd.startAndConnect()
 
     input()
