@@ -12,10 +12,15 @@ MeUltrasonicSensor ultraSensor(PORT_3);
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
+// Motors with Adafruit library
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(1);
 Adafruit_DCMotor *leftMotor = AFMS.getMotor(2);
 Adafruit_DCMotor *head = AFMS.getMotor(3);
 // Adafruit_DCMotor *rightReel = AFMS.getMotor(4);
+
+// Distance sensor
+#define trigPin 2
+#define echoPin 3
 
 bool debug = false;
 bool debugSensor = false;
@@ -31,6 +36,7 @@ struct sensortype
   float current;
   long freq;
   long counter;
+  int distance;
 } sensor;
 
 struct botStateType {
@@ -96,7 +102,7 @@ int StateMachine(int state, int controlvalue)
 void setup() {
   // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
-  Serial.print("AlpiBot v");Serial.println(codeversion);
+  Serial.print("MIA v");Serial.println(codeversion);
   stopBurst();
     
   AFMS.begin();  // create with the default frequency 1.6KHz
@@ -148,19 +154,50 @@ void readcommand(int &action, int &controlvalue)
 // the loop routine runs over and over again forever:
 void loop() {
   // Ultrasonic sensor for distance:
-  long distance = ultraSensor.distanceCm();
-  Serial.print("Distance: ");
-  Serial.print(distance);
-  Serial.println("cm");
-  delay(100);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  long duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration / 2) / 29.1;
+  sensor.distance = distance;
+  if (distance == 0) {
+    // This is likely an error with the sensor.
+    //buzz();
+    Serial.print("Distance == 0, sensor error\n");
+  } else if (distance < 12) {
+    Serial.print("OBSTACLE !");Serial.println(distance);Serial.print("\n");
+    moveBoth(-100);
+    delay(200);
+    stopBoth();
+  } else {
+    Serial.print("Distance > 12\n");
+  }
+  /* } else {
+    //motorstate=STILL;
+    //digitalWrite(led,LOW);
+    //digitalWrite(led2,HIGH);
+  }
+  if (distance >= 200 || distance <= 0) {
+    //Serial.println("200");
+  }
+  else {
+    //Serial.print(distance);
+    //Serial.println(" cm");
+  } */
 
   // Control/command loop:
   unsigned long currentMillis = millis();
   int incomingByte;
   int action, state, controlvalue;
   
-  sensor.freq = frequency();
-  burstSensors();
+  /* sensor.freq = frequency();
+  burstSensors(); */
 
   bool doaction = false;
   
@@ -237,10 +274,10 @@ void loop() {
   // }
     
 
-  if (debug) {
+  /* if (debug) {
       Serial.print("RW:"); Serial.println(sensor.rightEncoder);
       Serial.print("LW:"); Serial.println(sensor.leftEncoder);
       // Serial.print("RR:"); Serial.println(sensor.rightReelEncoder);
       // Serial.print("LR:"); Serial.println(sensor.leftReelEncoder);
-  }
+  } */
 }
