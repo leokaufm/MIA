@@ -69,7 +69,6 @@ class H264Player:
                 # ffplay.wait()
                 self.conn.close()
                 self.server_socket.close()
-                print("Video saved to", output_file)
 
     def interrupt(self):
         print ('Interrupting stream h264 streamer...')
