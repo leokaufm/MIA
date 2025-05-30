@@ -19,7 +19,7 @@ from motor.SerialHead import SerialHead
 from connection.H264Streamer import H264Streamer
 import Configuration
 
-HOST = "10.2.69.53" # find out ip address on laptop (server) with "hostname -I"
+HOST = "10.2.69.133" # find out ip address on laptop (server) with "hostname -I"
 
 ### Functions ###
 def remove_wt_and_exit(signum, frame):
@@ -92,6 +92,7 @@ if (Configuration.broadcast_IP):
 noticer = MCast.Sender()
 
 myip = get_ip_address('wlan0')
+print(f"myip: {myip}")
 
 if (len(myip)>0):
     myip = myip
@@ -162,7 +163,7 @@ print('Bot ready to follow!')
 # stream_telemetry = True
 # AUTONOMOUS_SLEEP = 0.05
 # Live
-while True:     
+while True:
   try:
     data = ''
     # TCP/IP server is configured as non-blocking
@@ -172,15 +173,6 @@ while True:
     cmd_data, address = sur.data, sur.address
     if cmd:
       print(f"cmd: {cmd}, cmd_data: {cmd_data}, address: {address}")
-
-    """ if autonomous and cmd == '':
-      # Autonomous control
-      time.sleep(AUTONOMOUS_SLEEP)
-      sdata = sensors.poll(frequency = 1, length = 1, stream = stream_telemetry)
-      [l_s, r_s] = control_strategy(sdata)
-      motors.left(l_s)
-      motors.right(r_s)
-      # print([l_s, r_s]) """
 
     if cmd == 'A':
       if (len(sur.message) == 5):
@@ -237,10 +229,12 @@ while True:
         if cmd_data == '':
           motors.stop()
           head.stop()
-        elif cmd_data == 'w': # backward
+        elif cmd_data == 's': # backward
           motors.both(80)
-        elif cmd_data == 's': # forward
+          print(connection.read(1000))
+        elif cmd_data == 'w': # forward
           motors.both(-80)
+          print(f"Received msg: {connection.read(1000)}")
         elif cmd_data == 'd': # turn right
           motors.left(-80)
           motors.right(80)

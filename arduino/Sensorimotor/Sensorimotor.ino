@@ -63,12 +63,14 @@ int StateMachine(int state, int controlvalue)
       moveRight(-controlvalue);
       break;   
     case 0x05: // both motors forward
-      moveRight(controlvalue);
-      moveLeft(controlvalue);
+      Serial.write("Moving backwards");
+      /* moveRight(controlvalue);
+      moveLeft(controlvalue); */
       break;  
     case 0x06: // both motors backwards
-      moveRight(-controlvalue);
-      moveLeft(-controlvalue);
+      Serial.write("Moving backwards");
+      /* moveRight(-controlvalue);
+      moveLeft(-controlvalue); */
       break;  
     case 0x07: // stop both motors
       stopLeft();
@@ -169,26 +171,14 @@ void loop() {
   if (distance == 0) {
     // This is likely an error with the sensor.
     //buzz();
-    Serial.print("Distance == 0, sensor error\n");
+    // Serial.print("Distance == 0, sensor error\n");
   } else if (distance < 12) {
     Serial.print("OBSTACLE !");Serial.println(distance);Serial.print("\n");
     moveBoth(-100);
     delay(200);
     stopBoth();
-  } else {
+  } /* else {
     Serial.print("Distance > 12\n");
-  }
-  /* } else {
-    //motorstate=STILL;
-    //digitalWrite(led,LOW);
-    //digitalWrite(led2,HIGH);
-  }
-  if (distance >= 200 || distance <= 0) {
-    //Serial.println("200");
-  }
-  else {
-    //Serial.print(distance);
-    //Serial.println(" cm");
   } */
 
   // Control/command loop:
@@ -264,20 +254,5 @@ void loop() {
     }
   }
 
-  loopEncoders();
-  // loopReelEncoders();
-
   StateMachine(state, controlvalue);
-
-  // if (autoretract) {
-  //   reelsMotors();
-  // }
-    
-
-  /* if (debug) {
-      Serial.print("RW:"); Serial.println(sensor.rightEncoder);
-      Serial.print("LW:"); Serial.println(sensor.leftEncoder);
-      // Serial.print("RR:"); Serial.println(sensor.rightReelEncoder);
-      // Serial.print("LR:"); Serial.println(sensor.leftReelEncoder);
-  } */
 }

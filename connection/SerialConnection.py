@@ -32,7 +32,7 @@ class SerialConnection(object):
         print('Connected to ALPIBot Arduino module')
         return True
 
-    print('Could not connect to ALPIBot Arduino module')
+    print('Could not connect to Arduino module')
     return False
 
   def serialcomm(self, timeout):

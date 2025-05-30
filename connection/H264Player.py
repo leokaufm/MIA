@@ -46,10 +46,14 @@ class H264Player:
             ["ffplay", "-fflags", "nobuffer", "-framedrop", "-"],
             stdin=subprocess.PIPE
         ) """
-
-        t = datetime.datetime.now()
-        output_file = "mia_" + t.strftime("%Y-%m-%d_%H-%M-%S") + ".h264"
-        with open(output_file, "wb") as f:
+        
+        # Build directory for saving video
+        d = datetime.datetime.now().strftime("%Y-%m-%d")
+        video_dir = os.path.join("mia_videos", d)
+        os.makedirs(video_dir, exist_ok=True)
+        t = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        video_path = os.path.join(video_dir, "mia_" + t + ".h264")
+        with open(video_path, "wb") as f:
             try:
                 while True:
                     data = self.stream.read(4096)

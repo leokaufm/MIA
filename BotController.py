@@ -70,7 +70,7 @@ print('Press i to start interaction sequence.')
 print('Press ! to start video recording and streaming.')
 
 while (True):
-  time.sleep(0.1) # control here how long the bot does a movement
+  time.sleep(0.5) # control here how long the bot does a movement
   print('>')
   data = None
   # Send h for hold to stop all motors
