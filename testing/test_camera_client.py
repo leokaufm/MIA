@@ -13,7 +13,7 @@ picam2.configure(video_config)
 encoder = H264Encoder(1000000)
 
 # TCP socket setup
-server_ip = "10.2.69.53"  # find out ip address of laptop (server) with hostname
+server_ip = "10.2.66.72"  # find out ip address of laptop (server) with hostname
 server_port = 10001
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((server_ip, server_port))

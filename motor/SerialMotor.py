@@ -23,3 +23,6 @@ class SerialMotor:
 
   def stop(self):
     self.connection.send(bytes('A07000', 'ascii'))
+
+  def interaction(self):
+    self.connection.send(bytes('A08000', 'ascii'))

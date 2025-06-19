@@ -66,17 +66,17 @@ video_streaming  = False
 
 print('Press x to stop Bot')
 print('Press f to enter new update frequency for the bot.')
-print('Press i to start interaction sequence.')
+# print('Press i to start interaction sequence.')
 print('Press ! to start video recording and streaming.')
 
 while (True):
-  time.sleep(0.5) # control here how long the bot does a movement
+  time.sleep(0.3) # control here how long the bot does a movement
   print('>')
   data = None
   # Send h for hold to stop all motors
   while not data:
     sent = sock.sendto(bytes('U'+'h'+'000','ascii'), server_address)
-    data = getch()
+    data = getch() 
   
   if (data.startswith('f')): # ???
     newfreq = input('Freq:');
@@ -105,8 +105,7 @@ while (True):
   else:
     sent = sock.sendto(bytes('U'+data+'000','ascii'), server_address)
   
-  """elif (data.startswith('i')):
-      sent = sock.sendto(bytes(cmd,'ascii'), server_address)"""
+  
 
   
 

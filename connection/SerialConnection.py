@@ -2,6 +2,7 @@ import platform
 import time
 import serial
 import os
+import termios
 
 baudrate = 9600
 
@@ -82,10 +83,16 @@ class SerialConnection(object):
     return data
 
   def flush(self):
-    if self.ser is not None:
+    """ if self.ser is not None:
       self.ser.flush()
       self.ser.flushInput()
-      self.ser.flushOutput()
+      self.ser.flushOutput() """
+    try:
+        if self.ser and self.ser.is_open:
+            self.ser.flush()
+    except (serial.SerialException, termios.error) as e:
+        print(f"[Flush Error] Could not flush serial port: {e}")
+        self.reconnect()
 
   def close(self):
     if self.ser is not None:

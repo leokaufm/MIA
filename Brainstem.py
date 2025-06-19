@@ -230,11 +230,11 @@ while True:
           motors.stop()
           head.stop()
         elif cmd_data == 's': # backward
-          motors.both(80)
-          print(connection.read(1000))
-        elif cmd_data == 'w': # forward
           motors.both(-80)
-          print(f"Received msg: {connection.read(1000)}")
+          # print(connection.read(1000))
+        elif cmd_data == 'w': # forward
+          motors.both(80)
+          # print(f"Received msg: {connection.read(1000)}")
         elif cmd_data == 'd': # turn right
           motors.left(-80)
           motors.right(80)
@@ -245,13 +245,19 @@ while True:
           motors.stop()
         elif cmd_data == 'q':
           head.left(40)
+          time.sleep(0.2)
+          head.stop()
         elif cmd_data == 'e':
           head.right(40)
+          time.sleep(0.2)
+          head.stop()
         elif cmd_data == 'r':
           head.stop()
         elif cmd_data == ' ':
           motors.stop()
           head.stop()
+        elif cmd_data == 'i':
+           motors.interaction()
         """ elif cmd_data == 't':
           stream_telemetry = not stream_telemetry
           if stream_telemetry:

@@ -42,10 +42,10 @@ class H264Player:
         print(f"Connection from {addr}")
         self.stream = self.conn.makefile("rb")
         # Opens window for video streaming
-        """ ffplay = subprocess.Popen(
+        ffplay = subprocess.Popen(
             ["ffplay", "-fflags", "nobuffer", "-framedrop", "-"],
             stdin=subprocess.PIPE
-        ) """
+        )
         
         # Build directory for saving video
         d = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -60,13 +60,13 @@ class H264Player:
                     if not data:
                         break
                     f.write(data)
-                    # ffplay.stdin.write(data)
+                    ffplay.stdin.write(data)
             except KeyboardInterrupt:
                 print("\nStopped.")
             finally:
                 self.stream.close()
-                # ffplay.stdin.close()
-                # ffplay.wait()
+                ffplay.stdin.close()
+                ffplay.wait()
                 self.conn.close()
                 self.server_socket.close()
 

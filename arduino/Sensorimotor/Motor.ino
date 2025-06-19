@@ -70,65 +70,88 @@ void stopHead() {
   moveHead(0);
 }
 
-/* void panel1(){
-  panel 1 - waking up/greeting
-  
-} 
-
-void panel2(){
-  // panel 2 - Curiosity
-    moveBoth(100); // approach
-    delay(1000);
-    stopBoth();
-    delay(100);
-
-    moveHead(40); // tilt head to left
-    delay(80);
-    stopHead(); // stop head, questioning look 
-    delay(2000);
-    moveHead(-40); // move head back
-    delay(115);
-    stopHead();
-    delay(500);
-}
-
-void panel3(){
-  // Panel 3 - Excitement
-  moveBoth(-100); // retreat a little
+void interaction(){
+  /* moveBoth(100); // move out of box
   delay(1500);
   stopBoth();
+  delay(2000); */
+  delay(2000); // wait shortly before starting
+
+  moveBoth(-80); // wiggle back and forth
+  delay(150);
+  moveBoth(80);
+  delay(150);
+  moveBoth(-80);
+  delay(150);
+  stopBoth();
+  delay(500);
+
+  moveBoth(-80); // wiggle back and forth
+  delay(150);
+  moveBoth(80);
+  delay(150);
+  moveBoth(-80);
+  delay(150);
+  stopBoth();
   delay(2000);
 
-  turnRight(200); // 360 turn to the right
+  turnLeft(80); // wiggle sideways
+  delay(150);
+  stopBoth();
+  turnRight(80);
+  delay(150);
+  stopBoth();
+  turnLeft(80);
+  delay(150);
+  stopBoth();
+  turnRight(80);
+  delay(150);
+  stopBoth();
+  delay(2000);
+
+  turnLeft(100); // turn left 90 degrees
+  delay(900);
+  stopBoth();
+  delay(2000);
+
+  moveBoth(100); // approach
+  delay(1000);
+  stopBoth();
+  delay(2000);
+
+  moveHead(-40); // tilt head to the right
+  delay(120);
+  stopHead(); // stop head, questioning look 
+  delay(3000);
+  moveHead(40); // move head back
+  delay(110);
+  stopHead();
+  delay(500);
+
+  moveBoth(-100); // retreat
+  delay(1000);
+  stopBoth();
+  delay(2000);
+
+  turnRight(100); // turn right 90 degrees
+  delay(900);
+  stopBoth();
+  delay(2000);
+
+  /* turnLeft(100); //turn left joy
   delay(2000);
   stopBoth();
+  delay(2000);
 
-  turnLeft(200); // 360 turn to the left
-  delay(1800);
+  turnRight(100); //turn right joy
+  delay(2000);
   stopBoth();
+  delay(2000); */
+
+  /* moveBoth(-100); // move back into box
+  delay(1500);
+  stopBoth();
+  delay(2000); */
 }
 
-void interaction_sequence(){
-  panel1();
-} */
 
-// void stopReels() {
-//   moveReels(0);
-// }
-
-// void moveReels(int speed) {
-//   if (speed == 0) {
-//     leftReel->run(RELEASE);
-//     rightReel->run(RELEASE);
-//   } else {
-//     leftReel->setSpeed(speed);
-//     rightReel->setSpeed(speed);
-//     if (speed > 0) {
-//       rightReel->run(FORWARD);
-//       leftReel->run(FORWARD);    
-//     } else {
-//       rightReel->run(BACKWARD);
-//       leftReel->run(BACKWARD);
-//     }
-//   }    
-// }

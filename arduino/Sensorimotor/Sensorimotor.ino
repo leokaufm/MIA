@@ -63,18 +63,19 @@ int StateMachine(int state, int controlvalue)
       moveRight(-controlvalue);
       break;   
     case 0x05: // both motors forward
-      Serial.write("Moving backwards");
-      /* moveRight(controlvalue);
-      moveLeft(controlvalue); */
+      moveRight(controlvalue);
+      moveLeft(controlvalue);
       break;  
     case 0x06: // both motors backwards
-      Serial.write("Moving backwards");
-      /* moveRight(-controlvalue);
-      moveLeft(-controlvalue); */
+      moveRight(-controlvalue);
+      moveLeft(-controlvalue);
       break;  
     case 0x07: // stop both motors
       stopLeft();
       stopRight();
+      break;
+    case 0x08: // interaction sequence
+      interaction();
       break;
     case 0x0A: // tilt head to the left
       moveHead(-controlvalue);
@@ -236,9 +237,6 @@ void loop() {
           case 0x1C:
             setCode(controlvalue);
             break;
-          // case 0x1D: 
-          //   setReelsSpeed(controlvalue);
-          //   break;
           case 0x21:
             sendPayloadSize();
             break;
