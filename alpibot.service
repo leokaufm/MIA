@@ -1,5 +1,5 @@
 [Unit]
-Description=Service to run ALPIBot base python program
+Description=Service to run bot base python program
 After=network-online.target
 
 [Service]

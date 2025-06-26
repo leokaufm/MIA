@@ -44,13 +44,13 @@ def timeout():
 
 # Stop all motors when process is killed
 def terminate():
-  print('Stopping ALPIBot')
+  print('Stopping bot')
   try:
     # motors.stop()
     # reels.stop()
     os.remove('running.wt')
   finally:
-    print('ALPIBot has stopped.')
+    print('bot has stopped.')
   exit(0)
 
 def reset_sensors():

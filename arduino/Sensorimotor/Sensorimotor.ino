@@ -1,5 +1,5 @@
 /**
- * ALPIBot
+ * Bot
  */
 
 #include <Wire.h>

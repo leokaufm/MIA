@@ -9,7 +9,7 @@ from libcamera import Transform
 from picamera2.encoders import H264Encoder
 from picamera2.outputs import FileOutput
 
-HOST = "10.17.71.16" # find out ip address on laptop (server) with "hostname -I"
+HOST = "10.2.66.235" # find out ip address on laptop (server) with "hostname -I"
 
 class H264Streamer:
     def __init__(self, server_ip):

@@ -1,13 +1,13 @@
 # This code can be added to .bashrc
 
-echo Welcome to AlpiBot
+echo Welcome to bot
 if ! pgrep python; then
-    echo 'Starting AlpiBot'
+    echo 'Starting bot'
     cd /srv/www/
     cd ALPI-bot
     killall -q pytjon 
     rm -f running.wt
     python Brainstem.py >> brainstem.log &
 else
-    echo 'AlpiBot is already running.'
+    echo 'Bot is already running.'
 fi

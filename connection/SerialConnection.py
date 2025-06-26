@@ -30,7 +30,7 @@ class SerialConnection(object):
         self.open = True
         print('Opened port ' + str(self.ser))
         self.read(100000) # Cleanup
-        print('Connected to ALPIBot Arduino module')
+        print('Connected to bot Arduino module')
         return True
 
     print('Could not connect to Arduino module')

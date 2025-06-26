@@ -82,10 +82,6 @@ while (True):
     newfreq = input('Freq:');
     sent = sock.sendto(bytes('AE'+'{:3d}'.format(newfreq),'ascii'), server_address)
     sent = sock.sendto(bytes('AB'+'{:3d}'.format(1),'ascii'), server_address)
-    """ elif (data.startswith('c')):
-        print('Command:')
-        cmd = sys.stdin.readline()
-        sent = sock.sendto(bytes(cmd,'ascii'), server_address) """
   elif (data.startswith('!')):
     if not video_streaming:
       print("Start video player, recording and streaming")
@@ -109,7 +105,7 @@ while (True):
 
   
 
-print("Stopping ALPIBot....")
+print("Stopping bot....")
 for i in range(1, 100):
   sent = sock.sendto(bytes('U'+data+'000', 'ascii'), server_address)
 
