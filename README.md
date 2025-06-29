@@ -1,5 +1,5 @@
 # MIA
-Movent to Inspire Affection. Code for a robot pet interacting with children.
+Movement to Inspire Affection. Code for a robot pet interacting with children.
 
 ## Hardware
 The robot has two driving wheels powered by two Makeblock Optical Encoder Motors-25
@@ -26,4 +26,4 @@ The Arduino receives data from the ultrasonic sensor and drives the wheel motors
 as soon as an object is detected within a threshold distance.
 
 # Media
-Based on: * https://www.youtube.com/watch?v=FxIlZGT8ktU
+Based on: *https://www.youtube.com/watch?v=FxIlZGT8ktU*
