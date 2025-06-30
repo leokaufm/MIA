@@ -65,8 +65,8 @@ getch = _find_getch()
 video_streaming  = False
 
 print('Press x to stop Bot')
-print('Press f to enter new update frequency for the bot.')
-# print('Press i to start interaction sequence.')
+print('Press i to start interaction sequence.')
+print('Control the bot\'s movements with w, a, s, d (wheels), and q, e (head)')
 print('Press ! to start video recording and streaming.')
 
 while (True):
@@ -78,16 +78,11 @@ while (True):
     sent = sock.sendto(bytes('U'+'h'+'000','ascii'), server_address)
     data = getch() 
   
-  if (data.startswith('f')): # ???
-    newfreq = input('Freq:');
-    sent = sock.sendto(bytes('AE'+'{:3d}'.format(newfreq),'ascii'), server_address)
-    sent = sock.sendto(bytes('AB'+'{:3d}'.format(1),'ascii'), server_address)
-  elif (data.startswith('!')):
+  if (data.startswith('!')):
     if not video_streaming:
       print("Start video player, recording and streaming")
       # Configurations for video recording and streaming
       video_player = H264Player()
-      # video_server.connect()
       video_player.spanAndConnect()
       sent = sock.sendto(bytes('S'+data+'000','ascii'), server_address)
       video_streaming = True

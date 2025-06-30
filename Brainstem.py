@@ -156,15 +156,6 @@ signal.signal(signal.SIGTERM, lambda signum, frame: terminate())
 
 # Control Loop
 print("Bot ready to follow!")
-# control_strategies = {
-#   'follow_and_turn': control_functions.follow_turn,
-#   'rotate_and_go': control_functions.rotate_go
-# }
-# control_strategy = control_strategies['follow_and_turn']
-
-# stream_telemetry = True
-# AUTONOMOUS_SLEEP = 0.05
-# Live
 while True:
     try:
         data = ""
@@ -233,10 +224,8 @@ while True:
                     head.stop()
                 elif cmd_data == "s":  # backward
                     motors.both(-80)
-                    # print(connection.read(1000))
                 elif cmd_data == "w":  # forward
                     motors.both(80)
-                    # print(f"Received msg: {connection.read(1000)}")
                 elif cmd_data == "d":  # turn right
                     motors.left(-80)
                     motors.right(80)
