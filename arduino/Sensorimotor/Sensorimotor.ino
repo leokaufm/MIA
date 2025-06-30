@@ -26,19 +26,6 @@ bool debug = false;
 bool debugSensor = false;
 String codeversion="1.0";
 
-struct sensortype
-{
-  long code;
-  long rightEncoder;
-  long leftEncoder;
-  long headEncoder;
-  float voltage;
-  float current;
-  long freq;
-  long counter;
-  int distance;
-} sensor;
-
 struct botStateType {
   long leftSpeed;
   long rightSpeed;
@@ -122,11 +109,8 @@ void setup() {
 
   memset(&sensor, 0, sizeof(sensor));
   memset(&botState, 0, sizeof(botState));
-
-  // botState.reelSpeed = 100;
   
   setupMotorEncoders();
-  // setupReelEncoders();
 }
 
 int incomingByte = 0;
@@ -178,17 +162,12 @@ void loop() {
     moveBoth(-100);
     delay(200);
     stopBoth();
-  } /* else {
-    Serial.print("Distance > 12\n");
-  } */
+  }
 
   // Control/command loop:
   unsigned long currentMillis = millis();
   int incomingByte;
   int action, state, controlvalue;
-  
-  /* sensor.freq = frequency();
-  burstSensors(); */
 
   bool doaction = false;
   
@@ -203,52 +182,10 @@ void loop() {
       case 'D':
         debug = (!debug);
         break;
-      case 'C': 
-        debugSensor = (!debugSensor);
-        break;
-      // case 'R':
-      //   autoretract = (!autoretract);
-      //   if (!autoretract)
-      //     stopReels();
-      //   break;
       case 'A': // motor controls
         readcommand(action, controlvalue);
         state = action; // let StateMachine process the action
         break;
-      case 'S': // sensor controls
-        readcommand(action, controlvalue);
-        state = 0;
-        switch (action) {
-          case 0x01:
-            startBurst(controlvalue);
-            break;
-          case 0x02:
-            stopBurst();
-            break;
-          case 0x1A:
-            // Determines the amount of frames to send in a burst.
-            setBurstSize(controlvalue);
-            break;
-          case 0x1B:
-            // Determines the updating frequency in relation to current arduino frequency (which is variable)
-            // For instance, 1 means the same frequency, 2 means half the frequency: 1/freq
-            setUpdateFreq(controlvalue);
-            break;
-          case 0x1C:
-            setCode(controlvalue);
-            break;
-          case 0x21:
-            sendPayloadSize();
-            break;
-          case 0x22:
-            transmitSensors();
-            break;
-          case 0x30:
-            // Reset encoders
-            resetEncoders();
-            // resetReelEncoders();
-            break;
-        }
     }
   }
 

@@ -71,10 +71,6 @@ void stopHead() {
 }
 
 void interaction(){
-  /* moveBoth(100); // move out of box
-  delay(1500);
-  stopBoth();
-  delay(2000); */
   delay(2000); // wait shortly before starting
 
   moveBoth(-80); // wiggle back and forth
@@ -137,21 +133,6 @@ void interaction(){
   delay(900);
   stopBoth();
   delay(2000);
-
-  /* turnLeft(100); //turn left joy
-  delay(2000);
-  stopBoth();
-  delay(2000);
-
-  turnRight(100); //turn right joy
-  delay(2000);
-  stopBoth();
-  delay(2000); */
-
-  /* moveBoth(-100); // move back into box
-  delay(1500);
-  stopBoth();
-  delay(2000); */
 }
 
 

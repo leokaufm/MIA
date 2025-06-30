@@ -1,9 +1,9 @@
 numpy
-opencv
+opencv-python
 pyserial
-fcntl
-msvcrt
-tty
+# fcntl, doesn't work on Windows
+# msvcrt, available on Windows by default
+# tty, available on Linux by default
 argparse
 matplotlib
 
