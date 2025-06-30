@@ -65,7 +65,7 @@ getch = _find_getch()
 video_streaming  = False
 
 print('Press x to stop Bot')
-print('Press i to start interaction sequence.')
+print('Press i to start sequence of movements.')
 print('Control the bot\'s movements with w, a, s, d (wheels), and q, e (head)')
 print('Press ! to start video recording and streaming.')
 
